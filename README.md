@@ -1,4 +1,4 @@
-# Payment-handler application
+# CountMyBill application
 
 
 ## Endpoints list: 
