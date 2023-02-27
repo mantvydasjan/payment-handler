@@ -19,7 +19,7 @@ public class Case {
     @Enumerated(EnumType.STRING)
     @Column(name = "country")
     private Country country;
-    private Resolution resolution;
+    private Resolution resolution = Resolution.UNRESOLVED;
     @OneToOne(cascade = CascadeType.ALL)
     @JsonManagedReference
     @JoinColumn(name = "payment_id")
@@ -28,7 +28,6 @@ public class Case {
     public Case(Payment payment, Country country) {
         this.payment = payment;
         this.country = country;
-        resolution = Resolution.UNRESOLVED;
     }
 
     public Case() {
@@ -37,6 +36,10 @@ public class Case {
     public Long getCaseId() {
         return caseId;
     }
+    
+    public void setCaseId(Long caseId) {
+        this.caseId = caseId;
+    }
 
     public Country getCountry() {
         return country;
@@ -44,6 +47,10 @@ public class Case {
 
     public Resolution getResolution() {
         return resolution;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     public void resolve() throws CaseAlreadyResolvedException {
@@ -56,7 +63,16 @@ public class Case {
         return (payment.getAmount() > MIN_AMOUNT && payment.getAmount() <= MAX_AMOUNT);
     }
 
-    
+
+    @Override
+    public String toString() {
+        return "Case{" +
+                "caseId=" + caseId +
+                ", country=" + country +
+                ", resolution=" + resolution +
+                ", payment=" + payment +
+                '}';
+    }
 }
 
 

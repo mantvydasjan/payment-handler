@@ -1,7 +1,6 @@
 package com.paymenthandler.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.Currency;
@@ -40,5 +39,5 @@ public class Payment {
     public Currency getCurrency() {
         return currency;
     }
-
+    
 }

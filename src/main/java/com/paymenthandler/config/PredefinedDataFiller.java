@@ -21,12 +21,12 @@ public class PredefinedDataFiller {
 
         return args -> {
             Payment payment = new Payment(1649223L, 499.99, Currency.getInstance("SEK"));
-            Case aCase = new Case(payment, Country.SWEDEN);
-            caseRepository.save(aCase);
+            Case case1 = new Case(payment, Country.SWEDEN);
+            caseRepository.save(case1);
 
             Payment payment1 = new Payment(1649224L, 2000D, Currency.getInstance("DKK"));
-            Case aCase1Ev = new Case(payment1, Country.DENMARK);
-            caseRepository.save(aCase1Ev);
+            Case case2 = new Case(payment1, Country.DENMARK);
+            caseRepository.save(case2);
 
         };
     }

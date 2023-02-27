@@ -5,71 +5,83 @@ import com.paymenthandler.exception.CaseAlreadyResolvedException;
 import com.paymenthandler.exception.CaseNotFoundException;
 import com.paymenthandler.model.Case;
 import com.paymenthandler.model.Country;
-import com.paymenthandler.service.CaseService;
+import com.paymenthandler.model.Resolution;
+import com.paymenthandler.repository.CaseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/cases")
 public class CaseController {
 
-    private final CaseService caseService;
+    @Autowired
+    private final CaseRepository caseRepository;
 
-    public CaseController(CaseService caseService) {
-        this.caseService = caseService;
+    public CaseController(CaseRepository caseRepository) {
+        this.caseRepository = caseRepository;
     }
 
     @PostMapping
-    public ResponseEntity<?> createCase(@RequestBody Case aCase) {
-        caseService.createCase(aCase);
+    public ResponseEntity<String> createCase(@RequestBody Case aCase) {
+        caseRepository.save(aCase);
         return new ResponseEntity<>("Case ID " + aCase.getCaseId() + " created", HttpStatus.CREATED);
     }
 
     @GetMapping("/{caseId}")
-    public ResponseEntity<?> retrieveCaseById(@PathVariable Long caseId) {
+    public ResponseEntity<Case> getCaseById(@PathVariable Long caseId) {
         try {
-            Case aCase = caseService.findCaseById(caseId);
+            Case aCase = caseRepository.findById(caseId).orElseThrow(() -> new CaseNotFoundException(caseId));
             return new ResponseEntity<>(aCase, HttpStatus.FOUND);
         } catch (CaseNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping
     public ResponseEntity<List<Case>> getAllCases() {
-        List<Case> aCases = caseService.findAllCases();
+        List<Case> aCases = caseRepository.findAll();
         return new ResponseEntity<>(aCases, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{caseId}")
-    public ResponseEntity<?> deleteCase(@PathVariable Long caseId) {
-        try {
-            caseService.deleteCase(caseId);
-            return new ResponseEntity<>("Case id " + caseId + " deleted.", HttpStatus.GONE);
-        } catch (CaseNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        }
     }
 
     @GetMapping(params = "country")
-    public ResponseEntity<?> getCasesByCountry(@RequestParam(value = "country") Country country) {
-        List<Case> aCases = caseService.findByCountry(country);
+    public ResponseEntity<List<Case>> getCasesByCountry(@RequestParam(value = "country") Country country) {
+        List<Case> aCases = caseRepository.findByCountry(country);
         return new ResponseEntity<>(aCases, HttpStatus.OK);
     }
 
-    @PutMapping("/{caseId}")
-    public ResponseEntity<?> resolveCase(@PathVariable Long caseId) {
+    @PutMapping("/{caseId}/resolution")
+    public ResponseEntity<String> resolveCase(@PathVariable Long caseId) {
         try {
-            Case aCase = caseService.resolveCase(caseId);
-            return new ResponseEntity<>("Case ID " + caseId + " resolved. Resolution: " + aCase.getResolution(), HttpStatus.ACCEPTED);
+            Case aCase = caseRepository.findById(caseId).orElseThrow(() -> new CaseNotFoundException(caseId));
+            aCase.resolve();
+            return new ResponseEntity<>("Case ID " + caseId + " resolved. Resolution: " + aCase.getResolution(), HttpStatus.OK);
         } catch (CaseNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (CaseAlreadyResolvedException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.ALREADY_REPORTED);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @DeleteMapping("/{caseId}")
+    public ResponseEntity<String> deleteCase(@PathVariable Long caseId) {
+        if (caseRepository.findById(caseId).isPresent()) {
+            caseRepository.deleteById(caseId);
+            return new ResponseEntity<>("Case id " + caseId + " deleted.", HttpStatus.OK);
+        } else return new ResponseEntity<>("Case id " + caseId + " not found.", HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/totalAmount")
+    public ResponseEntity<String> getTotalAmountOfPaymentsInUnresolvedCases() {
+        List<Case> unresolvedCases = caseRepository.findByResolution(Resolution.UNRESOLVED);
+        var groupByCurrency = unresolvedCases.stream().
+                collect(Collectors.groupingBy(aCase -> aCase.getPayment().getCurrency(), 
+                        Collectors.summingDouble(value -> value.getPayment().getAmount())));
+        return new ResponseEntity<>("Total amount: " + groupByCurrency, HttpStatus.OK);
     }
 }
 

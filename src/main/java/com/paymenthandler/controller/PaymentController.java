@@ -2,7 +2,8 @@ package com.paymenthandler.controller;
 
 
 import com.paymenthandler.model.Payment;
-import com.paymenthandler.service.PaymentService;
+import com.paymenthandler.repository.PaymentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,16 +16,16 @@ import java.util.List;
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    @Autowired
+    private final PaymentRepository paymentRepository;
 
-    public PaymentController(PaymentService paymentService) {
-        this.paymentService = paymentService;
+    public PaymentController(PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
     }
 
     @GetMapping
     public ResponseEntity<List<Payment>> getAllPayments() {
-        List<Payment> payments = paymentService.findAllPayments();
+        List<Payment> payments = paymentRepository.findAll();
         return new ResponseEntity<>(payments, HttpStatus.OK);
     }
-    
 }
