@@ -11,29 +11,28 @@ public class Payment {
 
     @Id
     @Column(name = "payment_id")
-    private Long paymentId;
-    private Double amount;
+    private long paymentId;
+    private long amountInCents;
     private Currency currency;
     @OneToOne(mappedBy = "payment")
     @JsonBackReference
     private Case aCase;
 
-    public Payment(Long paymentId, Double amount, Currency currency) {
+    public Payment(long paymentId, long amountInCents, Currency currency) {
         this.paymentId = paymentId;
-        this.amount = amount;
+        this.amountInCents = amountInCents;
         this.currency = currency;
-
     }
 
     public Payment() {
     }
 
-    public Long getPaymentId() {
+    public long getPaymentId() {
         return paymentId;
     }
 
-    public Double getAmount() {
-        return amount;
+    public long getAmountInCents() {
+        return amountInCents;
     }
 
     public Currency getCurrency() {

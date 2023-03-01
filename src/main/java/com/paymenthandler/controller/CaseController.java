@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,10 +34,10 @@ public class CaseController {
     }
 
     @GetMapping("/{caseId}")
-    public ResponseEntity<Case> getCaseById(@PathVariable Long caseId) {
+    public ResponseEntity<Case> getCaseById(@PathVariable UUID caseId) {
         try {
             Case aCase = caseRepository.findById(caseId).orElseThrow(() -> new CaseNotFoundException(caseId));
-            return new ResponseEntity<>(aCase, HttpStatus.FOUND);
+            return new ResponseEntity<>(aCase, HttpStatus.OK);
         } catch (CaseNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -55,7 +56,7 @@ public class CaseController {
     }
 
     @PutMapping("/{caseId}/resolution")
-    public ResponseEntity<String> resolveCase(@PathVariable Long caseId) {
+    public ResponseEntity<String> resolveCase(@PathVariable UUID caseId) {
         try {
             Case aCase = caseRepository.findById(caseId).orElseThrow(() -> new CaseNotFoundException(caseId));
             aCase.resolve();
@@ -68,7 +69,7 @@ public class CaseController {
     }
 
     @DeleteMapping("/{caseId}")
-    public ResponseEntity<String> deleteCase(@PathVariable Long caseId) {
+    public ResponseEntity<String> deleteCase(@PathVariable UUID caseId) {
         if (caseRepository.findById(caseId).isPresent()) {
             caseRepository.deleteById(caseId);
             return new ResponseEntity<>("Case id " + caseId + " deleted.", HttpStatus.OK);
@@ -80,7 +81,7 @@ public class CaseController {
         List<Case> unresolvedCases = caseRepository.findByResolution(Resolution.UNRESOLVED);
         var groupByCurrency = unresolvedCases.stream().
                 collect(Collectors.groupingBy(aCase -> aCase.getPayment().getCurrency(), 
-                        Collectors.summingDouble(value -> value.getPayment().getAmount())));
+                        Collectors.summingLong(value -> value.getPayment().getAmountInCents())));
         return new ResponseEntity<>("Total amount: " + groupByCurrency, HttpStatus.OK);
     }
 }

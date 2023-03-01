@@ -20,11 +20,11 @@ public class PredefinedDataFiller {
     CommandLineRunner commandLineRunner(CaseRepository caseRepository, PaymentRepository paymentRepository) {
 
         return args -> {
-            Payment payment = new Payment(1649223L, 499.99, Currency.getInstance("SEK"));
+            Payment payment = new Payment(1649223L, 499L, Currency.getInstance("SEK"));
             Case case1 = new Case(payment, Country.SWEDEN);
             caseRepository.save(case1);
 
-            Payment payment1 = new Payment(1649224L, 2000D, Currency.getInstance("DKK"));
+            Payment payment1 = new Payment(1649224L, 2000L, Currency.getInstance("DKK"));
             Case case2 = new Case(payment1, Country.DENMARK);
             caseRepository.save(case2);
 

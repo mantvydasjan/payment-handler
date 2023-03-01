@@ -8,16 +8,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 
 public class FakeCaseRepository implements CaseRepository {
-    
+
     List<Case> cases = new ArrayList();
-    
+
     @Override
     public <S extends Case> S save(S aCase) {
         cases.add(aCase);
@@ -25,16 +27,37 @@ public class FakeCaseRepository implements CaseRepository {
     }
 
     @Override
-    public Optional<Case> findById(Long id) {
+    public Optional<Case> findById(UUID id) {
         return cases.stream().filter(aCase -> aCase.getCaseId().equals(id)).findFirst();
+    }
+
+    @Override
+    public boolean existsById(UUID uuid) {
+        return false;
+    }
+
+    @Override
+    public <S extends Case> List<S> saveAll(Iterable<S> entities) {
+        return null;
     }
 
     @Override
     public List<Case> findAll() {
         return cases;
     }
+
     @Override
-    public void deleteById(Long id) {
+    public List<Case> findAllById(Iterable<UUID> uuids) {
+        return null;
+    }
+
+    @Override
+    public long count() {
+        return 0;
+    }
+
+    @Override
+    public void deleteById(UUID id) {
         Case aCase1 = cases.stream().filter(aCase -> aCase.getCaseId().equals(id)).findFirst().get();
         cases.remove(aCase1);
     }
@@ -43,13 +66,9 @@ public class FakeCaseRepository implements CaseRepository {
     public void delete(Case entity) {
 
     }
-    @Override
-    public boolean existsById(Long aLong) {
-        return false;
-    }
 
     @Override
-    public void deleteAllById(Iterable<? extends Long> longs) {
+    public void deleteAllById(Iterable<? extends UUID> uuids) {
 
     }
 
@@ -61,16 +80,6 @@ public class FakeCaseRepository implements CaseRepository {
     @Override
     public void deleteAll() {
 
-    }
-
-    @Override
-    public List<Case> findAll(Sort sort) {
-        return null;
-    }
-
-    @Override
-    public Page<Case> findAll(Pageable pageable) {
-        return null;
     }
 
     @Override
@@ -104,7 +113,7 @@ public class FakeCaseRepository implements CaseRepository {
     }
 
     @Override
-    public void deleteAllByIdInBatch(Iterable<Long> longs) {
+    public void deleteAllByIdInBatch(Iterable<UUID> uuids) {
 
     }
 
@@ -114,17 +123,17 @@ public class FakeCaseRepository implements CaseRepository {
     }
 
     @Override
-    public Case getOne(Long aLong) {
+    public Case getOne(UUID uuid) {
         return null;
     }
 
     @Override
-    public Case getById(Long aLong) {
+    public Case getById(UUID uuid) {
         return null;
     }
 
     @Override
-    public Case getReferenceById(Long aLong) {
+    public Case getReferenceById(UUID uuid) {
         return null;
     }
 
@@ -164,18 +173,14 @@ public class FakeCaseRepository implements CaseRepository {
     }
 
     @Override
-    public <S extends Case> List<S> saveAll(Iterable<S> entities) {
-        return null;
-    }
-
-
-    @Override
-    public List<Case> findAllById(Iterable<Long> longs) {
+    public List<Case> findAll(Sort sort) {
         return null;
     }
 
     @Override
-    public long count() {
-        return 0;
+    public Page<Case> findAll(Pageable pageable) {
+        return null;
     }
 }
+
+   

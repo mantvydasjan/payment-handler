@@ -4,18 +4,19 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.paymenthandler.exception.CaseAlreadyResolvedException;
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "cases")
 public class Case {
 
     @Transient
-    private final double MIN_AMOUNT = 0;
+    private static final long MIN_AMOUNT = 0L;
     @Transient
-    private final double MAX_AMOUNT = 1_000_000;
+    private static final long MAX_AMOUNT = 1_00_000_000L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "case_id", nullable = false, updatable = false)
-    private Long caseId;
+    private final UUID caseId = UUID.randomUUID();
     @Enumerated(EnumType.STRING)
     @Column(name = "country")
     private Country country;
@@ -33,12 +34,8 @@ public class Case {
     public Case() {
     }
 
-    public Long getCaseId() {
+    public UUID getCaseId() {
         return caseId;
-    }
-    
-    public void setCaseId(Long caseId) {
-        this.caseId = caseId;
     }
 
     public Country getCountry() {
@@ -60,10 +57,9 @@ public class Case {
     }
 
     private boolean isAmountValid() {
-        return (payment.getAmount() > MIN_AMOUNT && payment.getAmount() <= MAX_AMOUNT);
+        return (payment.getAmountInCents() > MIN_AMOUNT && payment.getAmountInCents() <= MAX_AMOUNT);
     }
-
-
+    
     @Override
     public String toString() {
         return "Case{" +

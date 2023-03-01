@@ -17,7 +17,7 @@ class CaseTest {
     @Test
     void shouldBeResolved() throws CaseAlreadyResolvedException {
         
-        payment = new Payment(10L, 200.99, Currency.getInstance("SEK"));
+        payment = new Payment(10L, 200L, Currency.getInstance("SEK"));
         aCase = new Case(payment, Country.SWEDEN);
         Resolution resolutionBefore = aCase.getResolution();
         
@@ -31,7 +31,7 @@ class CaseTest {
     @Test
     void shouldBeResolvedWithResubmit() throws CaseAlreadyResolvedException {
         
-        payment = new Payment(10L, 200.99, Currency.getInstance("SEK"));
+        payment = new Payment(10L, 200L, Currency.getInstance("SEK"));
         aCase = new Case(payment, Country.SWEDEN);
         Resolution expectedResolution = Resolution.RESUBMIT;
         
@@ -44,7 +44,7 @@ class CaseTest {
     @Test
     void shouldBeResolvedWithReturn() throws CaseAlreadyResolvedException {
         
-        payment = new Payment(10L, -99.9, Currency.getInstance("SEK"));
+        payment = new Payment(10L, -99L, Currency.getInstance("SEK"));
         aCase = new Case(payment, Country.SWEDEN);
         Resolution expectedResolution = Resolution.RETURN;
         
